@@ -153,7 +153,7 @@ class FineTuneDataSystemNLP:
             self._render_step_6_export()
         
         # Render sidebar metrics
-        self.sidebar_metrics.render_metrics()
+        self.sidebar_metrics.render_sidebar()
         
         # Auto-save session
         auto_save_current_session()
@@ -233,7 +233,7 @@ class FineTuneDataSystemNLP:
                             # Use large file OCR handler for PDFs
                             config = OCRConfig(
                                 timeout_per_page=30,
-                                max_total_timeout=1800,  # 30 minutes
+                                total_timeout=1800,  # 30 minutes
                                 memory_limit_mb=400,
                                 languages=['eng']
                             )
