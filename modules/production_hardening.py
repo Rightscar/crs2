@@ -23,7 +23,18 @@ from typing import Any, List, Dict, Union, Optional, Tuple
 from pathlib import Path
 import streamlit as st
 from pydantic import BaseModel, ValidationError
-import tiktoken
+
+# tiktoken import with error handling
+try:
+    import tiktoken
+    TIKTOKEN_AVAILABLE = True
+except ImportError:
+    TIKTOKEN_AVAILABLE = False
+    # Create a dummy tiktoken for type hints
+    class tiktoken:
+        @staticmethod
+        def get_encoding(name):
+            return None
 
 logger = logging.getLogger(__name__)
 
@@ -32,8 +43,19 @@ class ProductionHardening:
     """Comprehensive production hardening for deployment issues"""
     
     def __init__(self):
-        self.encoding = tiktoken.get_encoding("cl100k_base")  # GPT-4 encoding
+        if TIKTOKEN_AVAILABLE:
+            self.encoding = tiktoken.get_encoding("cl100k_base")  # GPT-4 encoding
+        else:
+            self.encoding = None
         self.max_tokens = 8000  # Conservative limit for GPT-4o-mini
+        
+    def _count_tokens(self, text: str) -> int:
+        """Safely count tokens with fallback when tiktoken is not available"""
+        if self.encoding:
+            return len(self.encoding.encode(text))
+        else:
+            # Fallback: approximate token count (1 token ≈ 4 characters)
+            return len(text) // 4
         
     # Issue 1: File Parsing - Flatten nested lists
     def flatten_extracted_content(self, content: Any) -> str:
@@ -325,7 +347,7 @@ class ProductionHardening:
                 
                 # Check if adding this sentence would exceed token limit
                 test_chunk = current_chunk + " " + sentence if current_chunk else sentence
-                token_count = len(self.encoding.encode(test_chunk))
+                token_count = self._count_tokens(test_chunk)
                 
                 if token_count <= max_tokens:
                     current_chunk = test_chunk
@@ -335,7 +357,7 @@ class ProductionHardening:
                         chunks.append(current_chunk.strip())
                     
                     # Check if single sentence is too long
-                    sentence_tokens = len(self.encoding.encode(sentence))
+                    sentence_tokens = self._count_tokens(sentence)
                     if sentence_tokens > max_tokens:
                         # Split long sentence by words
                         word_chunks = self._split_by_words(sentence, max_tokens)
@@ -363,7 +385,7 @@ class ProductionHardening:
         
         for word in words:
             test_chunk = " ".join(current_chunk + [word])
-            if len(self.encoding.encode(test_chunk)) <= max_tokens:
+            if self._count_tokens(test_chunk) <= max_tokens:
                 current_chunk.append(word)
             else:
                 if current_chunk:
@@ -392,8 +414,13 @@ class ProductionHardening:
         
         try:
             # Count tokens
-            tokens = self.encoding.encode(text)
-            total_tokens = len(tokens)
+            if self.encoding:
+                tokens = self.encoding.encode(text)
+                total_tokens = len(tokens)
+            else:
+                # Fallback when tiktoken not available
+                total_tokens = self._count_tokens(text)
+                tokens = None
             
             if total_tokens <= max_tokens:
                 return [text], total_tokens

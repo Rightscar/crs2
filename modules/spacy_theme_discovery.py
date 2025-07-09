@@ -86,12 +86,13 @@ class SpacyThemeDiscovery:
         self.phrase_matcher = None
         self.matcher = None
         self.sentence_model = None
+        self.spacy_available = SPACY_AVAILABLE  # Initialize from global
         self._initialize_models()
     
     def _initialize_models(self):
         """Initialize spaCy and other NLP models"""
         try:
-            if SPACY_AVAILABLE:
+            if self.spacy_available:
                 # Try to load spaCy model
                 model_name = f"{self.config.language}_core_web_sm"
                 try:
@@ -108,7 +109,8 @@ class SpacyThemeDiscovery:
                         self.logger.info("Loaded fallback spaCy model: en_core_web_sm")
                     except OSError:
                         self.logger.warning("No spaCy model available. Using fallback methods.")
-                        SPACY_AVAILABLE = False
+                        # Don't modify global SPACY_AVAILABLE, just set instance variable
+                        self.spacy_available = False
             
             # Initialize sentence transformer for semantic similarity
             if SENTENCE_TRANSFORMERS_AVAILABLE:
@@ -142,7 +144,7 @@ class SpacyThemeDiscovery:
             return []
         
         # Choose processing method based on available libraries
-        if SPACY_AVAILABLE and self.nlp:
+        if self.spacy_available and self.nlp:
             return self._discover_with_spacy(content, themes, custom_patterns)
         elif NLTK_AVAILABLE:
             return self._discover_with_nltk(content, themes)

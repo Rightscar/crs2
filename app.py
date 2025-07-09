@@ -233,9 +233,7 @@ class FineTuneDataSystemNLP:
                             # Use large file OCR handler for PDFs
                             config = OCRConfig(
                                 timeout_per_page=30,
-                                total_timeout=1800,  # 30 minutes
-                                memory_limit_mb=400,
-                                languages=['eng']
+                                total_timeout=1800  # 30 minutes
                             )
                             
                             success, full_text, error_msg = process_large_file_with_ui(
