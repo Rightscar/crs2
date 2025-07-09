@@ -236,9 +236,20 @@ class FineTuneDataSystemNLP:
                                 total_timeout=1800  # 30 minutes
                             )
                             
-                            success, full_text, error_msg = process_large_file_with_ui(
-                                uploaded_file, config
-                            )
+                            # Save uploaded file to temporary path for OCR processing
+                            import tempfile
+                            with tempfile.NamedTemporaryFile(delete=False, suffix='.pdf') as tmp_file:
+                                tmp_file.write(uploaded_file.read())
+                                tmp_file_path = tmp_file.name
+                            
+                            try:
+                                full_text, success, metadata = process_large_file_with_ui(tmp_file_path)
+                                error_msg = metadata.get('error', 'Unknown error') if not success else None
+                            finally:
+                                # Clean up temporary file
+                                import os
+                                if os.path.exists(tmp_file_path):
+                                    os.unlink(tmp_file_path)
                             
                             if not success:
                                 st.error(f"❌ Failed to extract content: {error_msg}")
