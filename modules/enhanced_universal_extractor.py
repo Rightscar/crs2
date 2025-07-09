@@ -21,7 +21,7 @@ class EnhancedUniversalExtractor:
     """
     
     def __init__(self):
-        self.supported_formats = ['.pdf', '.txt', '.docx', '.epub']
+        self.supported_formats = ['.pdf', '.txt', '.docx', '.epub', '.md']
         
         # Enhanced Q&A detection patterns
         self.qa_patterns = [
@@ -73,6 +73,8 @@ class EnhancedUniversalExtractor:
                 raw_content = self._extract_docx(file_path)
             elif file_ext == '.epub':
                 raw_content = self._extract_epub(file_path)
+            elif file_ext == '.md':
+                raw_content = self._extract_md(file_path)
             else:
                 raise ValueError(f"Unsupported file format: {file_ext}")
             
@@ -83,6 +85,57 @@ class EnhancedUniversalExtractor:
             logger.error(f"Extraction error for {file_path}: {e}")
             self.extraction_stats['extraction_errors'] += 1
             return []
+    
+    def extract_content(self, uploaded_file) -> str:
+        """
+        Extract content from uploaded file object (for Streamlit compatibility)
+        
+        Args:
+            uploaded_file: Streamlit uploaded file object
+            
+        Returns:
+            Extracted text content as string
+        """
+        # Validate input
+        if uploaded_file is None:
+            logger.warning("extract_content called with None uploaded_file")
+            return ""
+        
+        if not hasattr(uploaded_file, 'name') or not hasattr(uploaded_file, 'read'):
+            logger.warning("extract_content called with invalid uploaded_file object")
+            return ""
+        
+        import tempfile
+        
+        try:
+            # Save uploaded file to temporary path
+            with tempfile.NamedTemporaryFile(delete=False, suffix=f".{uploaded_file.name.split('.')[-1]}") as tmp_file:
+                tmp_file.write(uploaded_file.read())
+                tmp_file_path = tmp_file.name
+            
+            # Extract using file path method
+            extracted_data = self.extract_text(tmp_file_path)
+            
+            # Clean up temporary file
+            import os
+            if os.path.exists(tmp_file_path):
+                os.unlink(tmp_file_path)
+            
+            # Combine all extracted content into a single string
+            if extracted_data:
+                combined_text = "\n\n".join([
+                    f"Q: {item.get('question', '')}\nA: {item.get('answer', '')}" 
+                    if item.get('type') in ['qa', 'dialogue'] 
+                    else item.get('answer', '') or item.get('question', '')
+                    for item in extracted_data
+                ])
+                return combined_text
+            else:
+                return ""
+                
+        except Exception as e:
+            logger.error(f"Content extraction error for {uploaded_file.name}: {e}")
+            return ""
     
     def _smart_content_detection(self, text: str, source_type: str) -> List[Dict[str, Any]]:
         """
@@ -444,6 +497,15 @@ class EnhancedUniversalExtractor:
                 return file.read()
         except Exception as e:
             logger.error(f"TXT extraction failed: {e}")
+            return ""
+    
+    def _extract_md(self, file_path: str) -> str:
+        """Extract content from Markdown file"""
+        try:
+            with open(file_path, 'r', encoding='utf-8') as file:
+                return file.read()
+        except Exception as e:
+            logger.error(f"Markdown extraction failed: {e}")
             return ""
     
     def _extract_docx(self, file_path: str) -> str:

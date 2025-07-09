@@ -18,8 +18,18 @@ try:
     import pdf2image
     from PyPDF2 import PdfReader
     TESSERACT_AVAILABLE = True
+    PDFREADER_AVAILABLE = True
 except ImportError:
     TESSERACT_AVAILABLE = False
+    PDFREADER_AVAILABLE = False
+    # Create dummy classes for when imports fail
+    class PdfReader:
+        def __init__(self, *args, **kwargs):
+            raise ImportError("PyPDF2 not available")
+        
+        @property
+        def pages(self):
+            return []
 
 # PIL Image import (needed for type hints)
 try:
@@ -75,6 +85,10 @@ class LargeFileOCRHandler:
             # Check if it's a PDF
             if not file_path.lower().endswith('.pdf'):
                 return False, "Only PDF files supported for OCR", {}
+            
+            # Check if PyPDF2 is available
+            if not PDFREADER_AVAILABLE:
+                return False, "PyPDF2 not available - cannot process PDF files", {}
             
             # Try to read PDF and count pages
             try:
@@ -189,6 +203,10 @@ class LargeFileOCRHandler:
     def _process_text_pdf(self, file_path: str, progress_callback: Optional[callable] = None) -> Tuple[str, bool, Dict]:
         """Process PDF with extractable text"""
         try:
+            # Check if PyPDF2 is available
+            if not PDFREADER_AVAILABLE:
+                return "", False, {'error': "PyPDF2 not available - cannot process PDF files"}
+            
             reader = PdfReader(file_path)
             extracted_text = []
             

@@ -305,6 +305,10 @@ class EnhancedToneManager:
         """Get all available categories"""
         return list(self.categories.keys())
     
+    def get_available_tones(self) -> List[str]:
+        """Get all available tone IDs"""
+        return list(self.tone_definitions.keys())
+    
     def load_prompt_template(self, tone_id: str) -> Optional[str]:
         """Load prompt template for a specific tone"""
         

@@ -28,67 +28,83 @@ class EnhancedTheming:
     
     def __init__(self):
         self.themes = {
-            'default': {
-                'name': '🌟 Default',
-                'primary_color': '#FF6B6B',
+            'modern_gradient': {
+                'name': '🌈 Modern Gradient',
+                'primary_color': '#667eea',
                 'background_color': '#FFFFFF',
-                'secondary_background_color': '#F0F2F6',
-                'text_color': '#262730',
-                'font': 'sans serif'
+                'secondary_background_color': '#f7fafc',
+                'text_color': '#2d3748',
+                'font': 'Inter, system-ui, sans-serif',
+                'gradient': 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
             },
-            'spiritual': {
-                'name': '🧘 Spiritual',
-                'primary_color': '#8B5CF6',
-                'background_color': '#FEFEFE',
-                'secondary_background_color': '#F8F4FF',
-                'text_color': '#4C1D95',
-                'font': 'serif'
+            'neon_cyber': {
+                'name': '⚡ Neon Cyber',
+                'primary_color': '#00f5ff',
+                'background_color': '#0a0e27',
+                'secondary_background_color': '#1a1f3a',
+                'text_color': '#ffffff',
+                'font': 'JetBrains Mono, monospace',
+                'gradient': 'linear-gradient(135deg, #00f5ff 0%, #ff00ff 100%)'
             },
-            'nature': {
-                'name': '🌿 Nature',
-                'primary_color': '#10B981',
-                'background_color': '#FFFFFF',
-                'secondary_background_color': '#F0FDF4',
-                'text_color': '#064E3B',
-                'font': 'sans serif'
+            'glass_morphism': {
+                'name': '🔮 Glass Morphism',
+                'primary_color': '#8b5cf6',
+                'background_color': '#f8fafc',
+                'secondary_background_color': 'rgba(255, 255, 255, 0.25)',
+                'text_color': '#1e293b',
+                'font': 'SF Pro Display, system-ui, sans-serif',
+                'gradient': 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)'
             },
-            'ocean': {
-                'name': '🌊 Ocean',
-                'primary_color': '#3B82F6',
-                'background_color': '#FFFFFF',
-                'secondary_background_color': '#EFF6FF',
-                'text_color': '#1E3A8A',
-                'font': 'sans serif'
+            'aurora': {
+                'name': '🌌 Aurora',
+                'primary_color': '#a855f7',
+                'background_color': '#0f0f23',
+                'secondary_background_color': '#1a1a2e',
+                'text_color': '#e2e8f0',
+                'font': 'Poppins, sans-serif',
+                'gradient': 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)'
             },
-            'sunset': {
-                'name': '🌅 Sunset',
-                'primary_color': '#F59E0B',
-                'background_color': '#FFFBEB',
-                'secondary_background_color': '#FEF3C7',
-                'text_color': '#92400E',
-                'font': 'sans serif'
+            'minimal_zen': {
+                'name': '🎋 Minimal Zen',
+                'primary_color': '#059669',
+                'background_color': '#fefefe',
+                'secondary_background_color': '#f0fdf4',
+                'text_color': '#064e3b',
+                'font': 'Inter, system-ui, sans-serif',
+                'gradient': 'linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%)'
             },
-            'dark': {
-                'name': '🌙 Dark',
-                'primary_color': '#8B5CF6',
-                'background_color': '#0F172A',
-                'secondary_background_color': '#1E293B',
-                'text_color': '#F1F5F9',
-                'font': 'sans serif'
+            'sunset_vibes': {
+                'name': '🌅 Sunset Vibes',
+                'primary_color': '#f59e0b',
+                'background_color': '#fffbeb',
+                'secondary_background_color': '#fef3c7',
+                'text_color': '#92400e',
+                'font': 'Nunito, sans-serif',
+                'gradient': 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #dc2626 100%)'
             },
-            'minimal': {
-                'name': '⚪ Minimal',
-                'primary_color': '#6B7280',
-                'background_color': '#FFFFFF',
-                'secondary_background_color': '#F9FAFB',
-                'text_color': '#111827',
-                'font': 'monospace'
+            'ocean_depth': {
+                'name': '🌊 Ocean Depth',
+                'primary_color': '#0ea5e9',
+                'background_color': '#f0f9ff',
+                'secondary_background_color': '#e0f2fe',
+                'text_color': '#0c4a6e',
+                'font': 'Roboto, sans-serif',
+                'gradient': 'linear-gradient(135deg, #0ea5e9 0%, #0284c7 50%, #0369a1 100%)'
+            },
+            'retro_wave': {
+                'name': '🕹️ Retro Wave',
+                'primary_color': '#ff0080',
+                'background_color': '#1a0033',
+                'secondary_background_color': '#2d1b69',
+                'text_color': '#ffffff',
+                'font': 'Orbitron, monospace',
+                'gradient': 'linear-gradient(135deg, #ff0080 0%, #7928ca 50%, #0070f3 100%)'
             }
         }
         
         # Initialize session state
         if 'selected_theme' not in st.session_state:
-            st.session_state.selected_theme = 'default'
+            st.session_state.selected_theme = 'modern_gradient'
         
         if 'custom_font_size' not in st.session_state:
             st.session_state.custom_font_size = 16
