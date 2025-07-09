@@ -121,7 +121,7 @@ class FineTuneDataSystemNLP:
             return
         
         # Apply theming
-        self.theming.apply_theme(st.session_state.get('selected_theme', 'default'))
+        self.theming.apply_theme()
         
         # Render header
         self._render_header()
